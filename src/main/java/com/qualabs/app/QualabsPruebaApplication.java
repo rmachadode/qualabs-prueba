@@ -51,18 +51,35 @@ public class QualabsPruebaApplication {
 	
 	private static void partB(HashMap<String, List<String>> authModuleMap, HashMap<String, List<String>> contentModuleMap) {
 		HashMap<String, String> result = new HashMap<String, String>(); 
-		for (Map.Entry<String, List<String>> entryAuthModule : authModuleMap.entrySet()) {
-			String keyAuth = entryAuthModule.getKey();
-			List<String> usersKeyAuth = entryAuthModule.getValue();
-			for (String userAuth : usersKeyAuth) {
-				String keyContent = getUserProvider(userAuth, contentModuleMap, result);
-				if(!StringUtils.isEmpty(keyContent) && !result.containsKey(keyContent)) {
-					result.put(keyAuth, userAuth);
-					result.put(keyContent, userAuth);
+		int authSize = authModuleMap.size();
+		int contentSize = contentModuleMap.size();
+		int count = 0;
+		HashMap<String, List<String>> biggerMap;
+		HashMap<String, List<String>> smallerMap;
+		if(contentSize > authSize) {
+			biggerMap = contentModuleMap;
+			smallerMap = authModuleMap;
+		}else {
+			biggerMap = authModuleMap;
+			smallerMap = contentModuleMap;
+		}
+		for (Map.Entry<String, List<String>> entryModule : biggerMap.entrySet()) {
+			String key = entryModule.getKey();
+			count++;
+			List<String> users = entryModule.getValue();
+			for (String user : users) {
+				if(count >= smallerMap.size()) {
+					result.put(key, user);
+				}
+				String keySmaller = getUserProvider(user, smallerMap, result);
+				if(!StringUtils.isEmpty(keySmaller) && !result.containsKey(keySmaller)) {
+					result.put(key, user);
+					result.put(keySmaller, user);
 					break;
 				}
 			}
 		}
+		
 		printResultPartB(result);
 	}
 	
